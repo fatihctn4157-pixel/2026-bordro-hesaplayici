@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Profesyonel Bordro</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+
+<style>
+body{margin:0;font-family:Arial;background:#0f172a;color:#e2e8f0;}
+.container{max-width:900px;margin:auto;padding:20px;}
+.card{background:#1e293b;padding:20px;border-radius:12px;margin-bottom:20px;}
+input{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:none;}
+button{width:100%;padding:12px;background:#2563eb;border:none;color:white;border-radius:8px;font-size:16px;cursor:pointer;}
+button:hover{background:#1d4ed8;}
+.install-btn{position:fixed;bottom:20px;right:20px;background:#16a34a;padding:14px 20px;border-radius:30px;color:white;display:none;z-index:999;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+th,td{padding:8px;border:1px solid #334155;text-align:right;}
+th{background:#111827;}
+td:first-child,th:first-child{text-align:left;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>2026 Kurumsal Bordro Sistemi</h2>
+
+<div class="card">
+<label>Net Saat Ücreti</label>
+<input type="number" id="netSaat" placeholder="Örn: 300">
+<button onclick="hesapla()">HESAPLA</button>
+</div>
+
+<div id="sonuc"></div>
+
+</div>
+
+<button class="install-btn" id="installBtn">📲 Ana Ekrana Yükle</button>
+
+<script>
+function tl(x){
+return x.toLocaleString('tr-TR',{minimumFractionDigits:2})+" TL";
+}
+
+function hesapla(){
+let netSaat=parseFloat(document.getElementById("netSaat").value);
+let aylikSaat=225;
+let brut=netSaat*1.33*aylikSaat;
+let sgk=brut*0.14;
+let issizlik=brut*0.01;
+let gv=(brut-sgk-issizlik)*0.20;
+let damga=brut*0.00759;
+let net=brut-sgk-issizlik-gv-damga;
+
+document.getElementById("sonuc").innerHTML=`
+<div class="card">
+<table>
+<tr><th>Brüt</th><td>${tl(brut)}</td></tr>
+<tr><th>SGK</th><td>${tl(sgk)}</td></tr>
+<tr><th>İşsizlik</th><td>${tl(issizlik)}</td></tr>
+<tr><th>Gelir Vergisi</th><td>${tl(gv)}</td></tr>
+<tr><th>Damga</th><td>${tl(damga)}</td></tr>
+<tr><th>Ele Geçen Net</th><td>${tl(net)}</td></tr>
+</table>
+</div>`;
+}
+
+let deferredPrompt;
+const installBtn=document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt",(e)=>{
+e.preventDefault();
+deferredPrompt=e;
+installBtn.style.display="block";
+});
+
+installBtn.addEventListener("click",async()=>{
+if(!deferredPrompt) return;
+deferredPrompt.prompt();
+await deferredPrompt.userChoice;
+installBtn.style.display="none";
+});
+
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+</body>
+</html>
