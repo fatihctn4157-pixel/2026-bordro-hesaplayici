@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Profesyonel Bordro</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:#e2e8f0;}
+.container{max-width:1100px;margin:auto;padding:20px;}
+h1{text-align:center;margin-bottom:20px;}
+.card{background:#1e293b;padding:20px;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 15px rgba(0,0,0,0.3);}
+input{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:none;font-size:16px;}
+button{width:100%;padding:12px;background:#2563eb;border:none;color:white;border-radius:8px;font-size:16px;cursor:pointer;margin-top:10px;}
+button:hover{background:#1d4ed8;}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-top:20px;}
+.summary-box{background:#111827;padding:15px;border-radius:10px;border-left:4px solid #2563eb;}
+.install-btn{position:fixed;bottom:20px;right:20px;background:#16a34a;padding:12px 18px;border-radius:30px;color:white;display:none;z-index:999;}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>2026 Bordro Sistemi</h1>
+
+<div class="card">
+<label>Net Saat Ücreti</label>
+<input type="number" id="netSaat">
+
+<label>Mart Zam (%)</label>
+<input type="number" id="martZam">
+
+<label>Eylül Zam (%)</label>
+<input type="number" id="eylulZam">
+
+<button onclick="hesapla()">HESAPLA</button>
+</div>
+
+<div id="ozet"></div>
+</div>
+
+<button class="install-btn" id="installBtn">📲 Uygulamayı Yükle</button>
+
+<script>
+function tl(x){
+return x.toLocaleString('tr-TR',{minimumFractionDigits:2})+" TL";
+}
+
+function hesapla(){
+let netSaat=parseFloat(document.getElementById("netSaat").value)||0;
+let martZam=(parseFloat(document.getElementById("martZam").value)||0)/100;
+let eylulZam=(parseFloat(document.getElementById("eylulZam").value)||0)/100;
+
+if(netSaat<=0){alert("Saat ücreti giriniz.");return;}
+
+let aylikSaat=225;
+let martNetSaat=netSaat*(1+martZam);
+let eylulNetSaat=martNetSaat*(1+eylulZam);
+
+document.getElementById("ozet").innerHTML=`
+<div class="summary">
+<div class="summary-box"><h3>Başlangıç</h3>
+Saat: ${tl(netSaat)}<br>
+Aylık: ${tl(netSaat*aylikSaat)}</div>
+
+<div class="summary-box"><h3>Mart Zamlı</h3>
+Saat: ${tl(martNetSaat)}<br>
+Aylık: ${tl(martNetSaat*aylikSaat)}</div>
+
+<div class="summary-box"><h3>Eylül Zamlı</h3>
+Saat: ${tl(eylulNetSaat)}<br>
+Aylık: ${tl(eylulNetSaat*aylikSaat)}</div>
+</div>`;
+}
+
+let deferredPrompt;
+const installBtn=document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt",(e)=>{
+e.preventDefault();
+deferredPrompt=e;
+installBtn.style.display="block";
+});
+
+installBtn.addEventListener("click",async()=>{
+if(!deferredPrompt)return;
+deferredPrompt.prompt();
+await deferredPrompt.userChoice;
+installBtn.style.display="none";
+});
+
+if("serviceWorker"in navigator){
+navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+</body>
+</html>
